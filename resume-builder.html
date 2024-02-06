@@ -47,7 +47,8 @@
 
         .profile-section,
         .education-section,
-        .experience-section {
+        .experience-section,
+        .summary-section {
             background-color: #ffffff;
             padding: 20px;
             margin-bottom: 20px;
@@ -57,7 +58,8 @@
 
         .profile-section h4,
         .education-section h4,
-        .experience-section h4 {
+        .experience-section h4,
+        .summary-section h4 {
             border-bottom: 2px solid #007bff;
             padding-bottom: 5px;
             margin-bottom: 15px;
@@ -114,11 +116,27 @@
             background-color: #007bff;
             color: #ffffff;
         }
+
+        /* Hide buttons during print and export */
+        @media print {
+            #downloadButtonDiv,
+            #printButtonDiv {
+            display: none;
+        }
+        }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid header">
+    <div id="downloadButtonDiv" style="text-align: center; margin-bottom: 20px;">
+        <button id="downloadButton" onclick="downloadResume()">Download Resume</button>
+    </div>
+    
+    <div id="printButtonDiv" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="printResume()">Print Resume</button>
+    </div>
+    
+    <div class="container header">
         <div class="row">
             <div class="col-lg-8">
                 <h1 class="mb-4" style="font-size: 72px;">Jeevan Pandey</h1>
@@ -134,6 +152,21 @@
     </div>
     <div class="container">
         <div class="row">
+            <div class="col-lg-12">
+                <div class="summary-section">
+                    <h4 class="mb-4">Professional Summary</h4>
+                    <div class="work-details">
+                        <ul class="hyphen-cont">
+                            <p>Dynamic aviation professional specializing in check-in, boarding, and special handling at Transguard LLC since Sep 2022. Proactively monitors operations to prevent delays, ensuring compliance with regulations and resolving passenger issues.
+
+                               Diligent Warehouse Worker at Flipkart Logistics Instakart services (Jan 2018 - Sep 2021), demonstrating precision in receiving, inspecting, and organizing shipments. Collaborative team player with effective communication skills, contributing to seamless logistics processes.
+                                
+                               Results-driven Salesman at Pantaloons (Jul 2015 - Nov 2017), delivering exceptional customer service, cultivating strong relationships, and managing inventory. Adept at order processing and maintaining showroom aesthetics. Ready to leverage diverse skills in a dynamic role.
+                            </p>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div class="col-lg-4">
                 <div class="profile-section">
                     <div class="personal-details">
@@ -163,6 +196,13 @@
             <div class="col-lg-8">
                 <div class="experience-section">
                     <h4 class="mb-4">WORK EXPERIENCE</h4>
+                    <div class="work-details">
+                        <h3 class="company-name">Transguard LLC <span class="workdate">Sep 2022 - Present</span></h3>
+                        <h5 class="designation">Special Handling Agent</h5>
+                        <ul class="hyphen-cont">
+                            <p>Dynamic and customer-focused professional with a successful background in providing exceptional customer service across various facets of the aviation industry. Proficient in managing check-in, boarding, mishandled baggage, and special handling processes. Adept at utilizing customer handling systems, ensuring compliance with regulations, and resolving passenger issues. Known for proactive monitoring to prevent operational delays and disruptions</p>
+                        </ul>
+                    </div>
                     <div class="work-details">
                         <h3 class="company-name">Flipkart Logistics Instakart services <span class="workdate">Jan 2018 - Sep 2021</span></h3>
                         <h5 class="designation">Warehouse Worker</h5>
@@ -207,6 +247,56 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    
+    <script>
+        function downloadResume() {
+            // Hide the buttons during export
+            var downloadButtonDiv = document.getElementById("downloadButtonDiv");
+            var printButtonDiv = document.getElementById("printButtonDiv");
+            downloadButtonDiv.style.display = "none";
+            printButtonDiv.style.display = "none";
+    
+            // Create a new HTML file
+            var htmlContent = document.documentElement.outerHTML;
+    
+            // Convert HTML to PDF
+            html2pdf(htmlContent, {
+                margin: 10,
+                filename: 'resume.pdf',
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                image: { type: 'pdf', quality: 1 }
+            }).then(function () {
+                // Convert HTML to Excel
+                var tableToExcel = new ExcelGen({
+                    "src": htmlContent,
+                    "fileName": "resume.xlsx"
+                });
+                tableToExcel.generate();
+    
+                // Convert HTML to MS Word
+                var blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'resume.doc';
+                link.click();
+    
+                // Show the buttons after export
+                downloadButtonDiv.style.display = "block";
+                printButtonDiv.style.display = "block";
+            });
+        }
+    </script>
+
+    <script>
+        function printResume() {
+            window.print();
+        }
+    </script>
+
+
+
 </body>
 
 </html>
